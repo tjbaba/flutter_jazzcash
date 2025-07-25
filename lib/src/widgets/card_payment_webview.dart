@@ -49,6 +49,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
             final responseData = jsonDecode(message.message) as Map<String, dynamic>;
             _processPaymentResponse(responseData.cast<String, String>());
           } catch (e) {
+            Navigator.pop(context);
             widget.onPaymentFailure('Failed to parse payment response');
           }
         },
@@ -92,6 +93,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
             }
 
             if (error.url != null && error.url!.contains('jazzcash.com')) {
+              Navigator.pop(context);
               widget.onPaymentFailure('Payment page failed to load: ${error.description}');
             }
           },
@@ -600,6 +602,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
     } catch (e) {
       if (!_hasProcessedResponse) {
         _hasProcessedResponse = true;
+        Navigator.pop(context);
         widget.onPaymentFailure('Failed to process payment response');
       }
     }
@@ -627,6 +630,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
     } catch (e) {
       if (!_hasProcessedResponse) {
         _hasProcessedResponse = true;
+        Navigator.pop(context);
         widget.onPaymentFailure('Failed to extract payment response');
       }
     }
@@ -726,18 +730,21 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
         } else {
           if (!_hasProcessedResponse) {
             _hasProcessedResponse = true;
+            Navigator.pop(context);
             widget.onPaymentFailure('Payment response not found. Please contact support.');
           }
         }
       } catch (e) {
         if (!_hasProcessedResponse) {
           _hasProcessedResponse = true;
+          Navigator.pop(context);
           widget.onPaymentFailure('Failed to parse payment response');
         }
       }
         }).catchError((error) {
       if (!_hasProcessedResponse) {
         _hasProcessedResponse = true;
+        Navigator.pop(context);
         widget.onPaymentFailure('Failed to extract payment response');
       }
     });
@@ -761,6 +768,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
         );
 
         if (!isValid) {
+          Navigator.pop(context);
           widget.onPaymentFailure('Invalid payment response. Transaction may be compromised.');
           return;
         }
@@ -770,11 +778,14 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
       final response = JazzCashCardPaymentResponse.fromJson(responseDataMap);
 
       if (response.isSuccessful) {
+        Navigator.pop(context);
         widget.onPaymentSuccess(response);
       } else {
+        Navigator.pop(context);
         widget.onPaymentFailure(response.responseMessage);
       }
     } catch (e) {
+      Navigator.pop(context);
       widget.onPaymentFailure('Failed to process payment response: $e');
     }
   }

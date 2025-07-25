@@ -1,6 +1,11 @@
 # Changelog
 
 ## [1.0.3] - 2025-07-26
+### Fixed
+### Changed
+- Issue in card payment fixed properly
+
+## [1.0.3] - 2025-07-26
 ### Changed
 - Increased JazzCash mobile wallet payment timeout from 30 seconds to 120 seconds
 
