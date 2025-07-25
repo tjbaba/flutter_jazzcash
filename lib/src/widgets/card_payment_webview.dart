@@ -5,7 +5,7 @@ import '../models/jazzcash_config.dart';
 import '../models/payment_models.dart';
 import '../utils/hash_generator.dart';
 
-/// WebView widgets for JazzCash card payments
+/// WebView widget for JazzCash card payments
 class JazzCashCardPaymentWebView extends StatefulWidget {
   final JazzCashConfig config;
   final JazzCashCardPaymentRequest paymentRequest;
@@ -81,17 +81,17 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
             _handlePageFinished(url);
           },
           onWebResourceError: (WebResourceError error) {
-            // Ignore Norton security widgets and similar third-party resource errors
-            if (error.url?.contains('norton.com') == true ||
-                error.url?.contains('symantec.com') == true ||
-                error.url?.contains('verisign.com') == true ||
-                error.url?.contains('mastercard.com') == true ||
-                error.description?.contains('ERR_BLOCKED_BY_ORB') == true ||
-                error.description?.contains('X-Frame-Options') == true) {
+            // Ignore Norton security widget and similar third-party resource errors
+            if (error.url != null && (error.url!.contains('norton.com') ||
+                error.url!.contains('symantec.com') ||
+                error.url!.contains('verisign.com') ||
+                error.url!.contains('mastercard.com')) ||
+                error.description != null && (error.description!.contains('ERR_BLOCKED_BY_ORB') ||
+                    error.description!.contains('X-Frame-Options'))) {
               return;
             }
 
-            if (error.url?.contains('jazzcash.com') == true) {
+            if (error.url != null && error.url!.contains('jazzcash.com')) {
               widget.onPaymentFailure('Payment page failed to load: ${error.description}');
             }
           },
@@ -779,7 +779,6 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
       final response = JazzCashCardPaymentResponse.fromJson(responseDataMap);
 
       if (response.isSuccessful) {
-        Navigator.pop(context);
         widget.onPaymentSuccess(response);
       } else {
         widget.onPaymentFailure(response.responseMessage);
@@ -824,7 +823,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
           // Loading overlay
           if (_isLoading)
             Container(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               child: const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
