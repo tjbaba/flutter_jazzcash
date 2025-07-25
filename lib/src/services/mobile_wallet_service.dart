@@ -79,7 +79,7 @@ class JazzCashMobileWalletService {
       Uri.parse(url),
       headers: headers,
       body: body,
-    ).timeout(const Duration(seconds: 30));
+    ).timeout(const Duration(seconds: 120));
 
     print('🔍 DEBUG: Response Status: ${response.statusCode}');
     print('🔍 DEBUG: Response Body: ${response.body}');
@@ -124,7 +124,7 @@ class JazzCashMobileWalletService {
         Uri.parse(url),
         headers: headers,
         body: body,
-      ).timeout(const Duration(seconds: 30));
+      ).timeout(const Duration(seconds: 120));
 
       print('🔍 DEBUG: Status Response: ${response.statusCode}');
       print('🔍 DEBUG: Status Body: ${response.body}');
