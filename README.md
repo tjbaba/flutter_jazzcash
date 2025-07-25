@@ -1,5 +1,15 @@
 # Flutter JazzCash Package - Complete User Guide
 
+**Developer:** [Talha Javed](https://talha-javed-ch.web.app/) | **GitHub:** [@talhajaved](https://github.com/tjbaba)
+
+
+## Screenshots
+
+|          Mobile Wallet Payment           |              Card Payment              |           Card Payment           |
+|:----------------------------------------:|:--------------------------------------:|:--------------------------------:|
+| ![Mobile Wallet](screenshots/mobile.jpg) | ![Card Payment](screenshots/card1.jpg) | ![Status](screenshots/card2.jpg) |
+
+
 A comprehensive guide for integrating JazzCash payments in your Flutter app using both mobile wallet and card payment methods.
 
 ## Table of Contents
