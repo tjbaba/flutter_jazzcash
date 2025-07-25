@@ -27,3 +27,11 @@ topics:
   - pakistan
   - mobile-wallet
   - card-payment
+
+screenshots:
+  - description: 'Mobile Wallet Payment'
+    path: screenshots/mobile.jpg
+  - description: 'Card Payment Webview'
+    path: screenshots/card1.jpg
+  - description: 'Card Payment'
+    path: screenshots/card2.jpg
