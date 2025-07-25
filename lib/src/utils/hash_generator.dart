@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/cupertino.dart';
 
 /// Utility class for generating JazzCash secure hashes
 class JazzCashHashGenerator {
@@ -202,7 +203,7 @@ class JazzCashHashGenerator {
           responseData['pp_SecureHash']?.toString().toUpperCase() ?? '';
 
       if (receivedHash.isEmpty) {
-        print('❌ No secure hash found in response');
+        debugPrint('❌ No secure hash found in response');
         return false;
       }
       final dataForValidation = Map<String, dynamic>.from(responseData);
@@ -217,25 +218,26 @@ class JazzCashHashGenerator {
         ('Original Flexible Method', _validateOriginalFlexible),
       ];
 
-      print('Received Hash: $receivedHash');
+      debugPrint('❌ No secure hash found in response');
+      ('Received Hash: $receivedHash');
 
       for (final (methodName, validationMethod) in validationMethods) {
         try {
           final expectedHash =
               validationMethod(dataForValidation, integritySalt).toUpperCase();
-          print('$methodName: $expectedHash');
+          debugPrint('$methodName: $expectedHash');
 
           if (receivedHash == expectedHash) {
             return true;
           }
         } catch (e) {
-          print('❌ Error in $methodName: $e');
+          debugPrint('❌ Error in $methodName: $e');
           continue;
         }
       }
       return false;
     } catch (e) {
-      print('❌ Hash validation error: $e');
+      debugPrint('❌ Hash validation error: $e');
       return false;
     }
   }

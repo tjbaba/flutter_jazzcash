@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../models/jazzcash_config.dart';
@@ -787,7 +786,7 @@ class _JazzCashCardPaymentWebViewState
         );
 
         if (!isValid) {
-          print('❌ Hash validation failed - rejecting transaction');
+          debugPrint('❌ Hash validation failed - rejecting transaction');
           Navigator.pop(context);
           widget.onPaymentFailure(
               'Payment verification failed. Transaction may be compromised. Please try again or contact support.');
@@ -795,7 +794,7 @@ class _JazzCashCardPaymentWebViewState
         }
       } else {
         // No hash provided - reject transaction
-        print('❌ No secure hash found in response');
+        debugPrint('❌ No secure hash found in response');
         Navigator.pop(context);
         widget.onPaymentFailure(
             'Payment response missing security verification. Please try again.');
