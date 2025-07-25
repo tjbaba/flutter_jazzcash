@@ -12,8 +12,8 @@ class JazzCashMobileWalletService {
 
   /// Process mobile wallet payment
   Future<JazzCashMobileWalletResponse> processPayment(
-      JazzCashMobileWalletRequest request,
-      ) async {
+    JazzCashMobileWalletRequest request,
+  ) async {
     try {
       final requestData = _buildRequestData(request);
       final response = await _makeApiCall(requestData);
@@ -55,7 +55,7 @@ class JazzCashMobileWalletService {
 
     // Generate secure hash - FIXED: Pass data map, not hashString
     data['pp_SecureHash'] = JazzCashHashGenerator.generateMobileWalletHash(
-      data,  // ✅ Pass the data map
+      data, // ✅ Pass the data map
       config.integritySalt,
     );
 
@@ -72,17 +72,13 @@ class JazzCashMobileWalletService {
 
     final body = jsonEncode(data);
 
-    print('🔍 DEBUG: Request URL: $url');
-    print('🔍 DEBUG: Request Data: $data');
-
-    final response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: body,
-    ).timeout(const Duration(seconds: 120));
-
-    print('🔍 DEBUG: Response Status: ${response.statusCode}');
-    print('🔍 DEBUG: Response Body: ${response.body}');
+    final response = await http
+        .post(
+          Uri.parse(url),
+          headers: headers,
+          body: body,
+        )
+        .timeout(const Duration(seconds: 120));
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body) as Map<String, dynamic>;
@@ -117,17 +113,13 @@ class JazzCashMobileWalletService {
 
       final body = jsonEncode(requestData);
 
-      print('🔍 DEBUG: Status Inquiry URL: $url');
-      print('🔍 DEBUG: Status Inquiry Data: $requestData');
-
-      final response = await http.post(
-        Uri.parse(url),
-        headers: headers,
-        body: body,
-      ).timeout(const Duration(seconds: 120));
-
-      print('🔍 DEBUG: Status Response: ${response.statusCode}');
-      print('🔍 DEBUG: Status Body: ${response.body}');
+      final response = await http
+          .post(
+            Uri.parse(url),
+            headers: headers,
+            body: body,
+          )
+          .timeout(const Duration(seconds: 120));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;

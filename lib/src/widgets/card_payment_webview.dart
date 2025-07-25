@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../models/jazzcash_config.dart';
@@ -23,10 +24,12 @@ class JazzCashCardPaymentWebView extends StatefulWidget {
   });
 
   @override
-  State<JazzCashCardPaymentWebView> createState() => _JazzCashCardPaymentWebViewState();
+  State<JazzCashCardPaymentWebView> createState() =>
+      _JazzCashCardPaymentWebViewState();
 }
 
-class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView> {
+class _JazzCashCardPaymentWebViewState
+    extends State<JazzCashCardPaymentWebView> {
   late final WebViewController _webViewController;
   bool _isLoading = true;
   String _pageTitle = 'JazzCash Payment';
@@ -46,7 +49,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
         'PaymentResponse',
         onMessageReceived: (JavaScriptMessage message) {
           try {
-            final responseData = jsonDecode(message.message) as Map<String, dynamic>;
+            final responseData =
+                jsonDecode(message.message) as Map<String, dynamic>;
             _processPaymentResponse(responseData.cast<String, String>());
           } catch (e) {
             Navigator.pop(context);
@@ -54,7 +58,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
           }
         },
       )
-      ..setUserAgent('Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36')
+      ..setUserAgent(
+          'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36')
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
@@ -68,7 +73,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
             });
 
             // Inject JavaScript to capture POST data when page starts loading
-            if (url.contains('jazzcash.com') || url.contains('gateway.mastercard.com')) {
+            if (url.contains('jazzcash.com') ||
+                url.contains('gateway.mastercard.com')) {
               _injectPostCaptureScript();
             }
           },
@@ -83,10 +89,11 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
           },
           onWebResourceError: (WebResourceError error) {
             // Ignore Norton security widget and similar third-party resource errors
-            if (error.url != null && (error.url!.contains('norton.com') ||
-                error.url!.contains('symantec.com') ||
-                error.url!.contains('verisign.com') ||
-                error.url!.contains('mastercard.com')) ||
+            if (error.url != null &&
+                    (error.url!.contains('norton.com') ||
+                        error.url!.contains('symantec.com') ||
+                        error.url!.contains('verisign.com') ||
+                        error.url!.contains('mastercard.com')) ||
                 (error.description.contains('ERR_BLOCKED_BY_ORB') ||
                     error.description.contains('X-Frame-Options'))) {
               return;
@@ -94,14 +101,16 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
 
             if (error.url != null && error.url!.contains('jazzcash.com')) {
               Navigator.pop(context);
-              widget.onPaymentFailure('Payment page failed to load: ${error.description}');
+              widget.onPaymentFailure(
+                  'Payment page failed to load: ${error.description}');
             }
           },
           onNavigationRequest: (NavigationRequest request) {
             // **DYNAMIC: Handle return URL based on provided URL**
             if (_isReturnUrl(request.url)) {
               _handleReturnUrl(request.url);
-              return NavigationDecision.prevent; // Prevent navigation to non-existent page
+              return NavigationDecision
+                  .prevent; // Prevent navigation to non-existent page
             }
 
             // Log URL components for analysis
@@ -136,7 +145,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
       final currentUri = Uri.parse(url);
 
       // Match by host and path
-      if (returnUri.host == currentUri.host && returnUri.path == currentUri.path) {
+      if (returnUri.host == currentUri.host &&
+          returnUri.path == currentUri.path) {
         return true;
       }
 
@@ -275,13 +285,14 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
   }
 
   Map<String, String> _generateCardPaymentForm() {
-    final txnRefNo = widget.paymentRequest.txnRefNo ??
-        DateTimeHelper.generateTxnRefNo();
+    final txnRefNo =
+        widget.paymentRequest.txnRefNo ?? DateTimeHelper.generateTxnRefNo();
     final txnDateTime = DateTimeHelper.formatDateTime(DateTime.now());
     final txnExpiryDateTime = DateTimeHelper.generateExpiryDateTime();
 
     // Convert amount to paisas (multiply by 100)
-    final amountInPaisas = (widget.paymentRequest.amount * 100).toInt().toString();
+    final amountInPaisas =
+        (widget.paymentRequest.amount * 100).toInt().toString();
 
     final Map<String, dynamic> data = {
       'pp_Version': '1.1',
@@ -324,7 +335,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
 
   String _generatePaymentFormHTML(Map<String, String> formData) {
     final formFields = formData.entries
-        .map((entry) => '<input type="hidden" name="${entry.key}" value="${entry.value}">')
+        .map((entry) =>
+            '<input type="hidden" name="${entry.key}" value="${entry.value}">')
         .join('\n');
 
     return '''
@@ -560,11 +572,10 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
         if (formData.isNotEmpty && formData.containsKey('pp_ResponseCode')) {
           _processPaymentResponse(formData.cast<String, String>());
         }
-
       } catch (e) {
         // Silent error handling
       }
-        }).catchError((error) {
+    }).catchError((error) {
       // Silent error handling
     });
   }
@@ -579,11 +590,14 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
       final uri = Uri.parse(url);
       final queryParams = uri.queryParameters;
 
-      if (queryParams.isNotEmpty && queryParams.containsKey('pp_ResponseCode')) {
+      if (queryParams.isNotEmpty &&
+          queryParams.containsKey('pp_ResponseCode')) {
         _processPaymentResponse(queryParams);
       } else {
         // Check if the page title or content indicates success/failure
-        final isError404 = url.contains('404') || _pageTitle.contains('404') || _pageTitle.contains('Not Found');
+        final isError404 = url.contains('404') ||
+            _pageTitle.contains('404') ||
+            _pageTitle.contains('Not Found');
 
         if (isError404) {
           // Try to get the last successful response from page content
@@ -723,15 +737,18 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
         final decodedResult = cleanResult.replaceAll('\\"', '"');
 
         final extractedData = jsonDecode(decodedResult) as Map<String, dynamic>;
-        final responseData = extractedData['responseData'] as Map<String, dynamic>;
+        final responseData =
+            extractedData['responseData'] as Map<String, dynamic>;
 
-        if (responseData.isNotEmpty && responseData.containsKey('pp_ResponseCode')) {
+        if (responseData.isNotEmpty &&
+            responseData.containsKey('pp_ResponseCode')) {
           _processPaymentResponse(responseData.cast<String, String>());
         } else {
           if (!_hasProcessedResponse) {
             _hasProcessedResponse = true;
             Navigator.pop(context);
-            widget.onPaymentFailure('Payment response not found. Please contact support.');
+            widget.onPaymentFailure(
+                'Payment response not found. Please contact support.');
           }
         }
       } catch (e) {
@@ -741,7 +758,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
           widget.onPaymentFailure('Failed to parse payment response');
         }
       }
-        }).catchError((error) {
+    }).catchError((error) {
       if (!_hasProcessedResponse) {
         _hasProcessedResponse = true;
         Navigator.pop(context);
@@ -758,23 +775,34 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
     _hasProcessedResponse = true;
 
     try {
-      // Validate the response hash if possible
+      // Convert to proper format
       final responseDataMap = Map<String, dynamic>.from(responseData);
 
+      // DELEGATE hash validation to the proper class
       if (responseData.containsKey('pp_SecureHash')) {
+        // Use the centralized validator - this is the ONLY place validation should happen
         final isValid = JazzCashHashGenerator.validateResponseHash(
           responseDataMap,
           widget.config.integritySalt,
         );
 
         if (!isValid) {
+          print('❌ Hash validation failed - rejecting transaction');
           Navigator.pop(context);
-          widget.onPaymentFailure('Invalid payment response. Transaction may be compromised.');
+          widget.onPaymentFailure(
+              'Payment verification failed. Transaction may be compromised. Please try again or contact support.');
           return;
         }
+      } else {
+        // No hash provided - reject transaction
+        print('❌ No secure hash found in response');
+        Navigator.pop(context);
+        widget.onPaymentFailure(
+            'Payment response missing security verification. Please try again.');
+        return;
       }
 
-      // Create response object
+      // Create response object and process result
       final response = JazzCashCardPaymentResponse.fromJson(responseDataMap);
 
       if (response.isSuccessful) {
@@ -831,7 +859,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00a651)),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xFF00a651)),
                     ),
                     SizedBox(height: 16),
                     Text(
@@ -855,7 +884,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cancel Payment?'),
-        content: const Text('Are you sure you want to cancel this payment? Your transaction will not be completed.'),
+        content: const Text(
+            'Are you sure you want to cancel this payment? Your transaction will not be completed.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

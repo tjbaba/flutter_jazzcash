@@ -1,8 +1,15 @@
 # Changelog
 
+## [1.0.5] - 2025-07-26
+### Fixed
+- Issue in card payment fixed properly
+### Changed
+- Removed unnecessary debug print statements from WebView and hash generator
+- Cleaned up console output for production use
+- Improved code maintainability without affecting functionality
+
 ## [1.0.4] - 2025-07-26
 ### Fixed
-### Changed
 - Issue in card payment fixed properly
 
 ## [1.0.3] - 2025-07-26
