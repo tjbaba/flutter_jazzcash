@@ -86,8 +86,8 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
                 error.url!.contains('symantec.com') ||
                 error.url!.contains('verisign.com') ||
                 error.url!.contains('mastercard.com')) ||
-                error.description != null && (error.description!.contains('ERR_BLOCKED_BY_ORB') ||
-                    error.description!.contains('X-Frame-Options'))) {
+                (error.description.contains('ERR_BLOCKED_BY_ORB') ||
+                    error.description.contains('X-Frame-Options'))) {
               return;
             }
 
@@ -544,27 +544,25 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
     ''';
 
     _webViewController.runJavaScriptReturningResult(script).then((result) {
-      if (result != null) {
-        try {
-          final resultStr = result.toString();
-          final cleanResult = resultStr.startsWith('"') && resultStr.endsWith('"')
-              ? resultStr.substring(1, resultStr.length - 1)
-              : resultStr;
-          final decodedResult = cleanResult.replaceAll('\\"', '"');
+      try {
+        final resultStr = result.toString();
+        final cleanResult = resultStr.startsWith('"') && resultStr.endsWith('"')
+            ? resultStr.substring(1, resultStr.length - 1)
+            : resultStr;
+        final decodedResult = cleanResult.replaceAll('\\"', '"');
 
-          final allData = jsonDecode(decodedResult) as Map<String, dynamic>;
+        final allData = jsonDecode(decodedResult) as Map<String, dynamic>;
 
-          // If we found response data, process it
-          final formData = allData['formData'] as Map<String, dynamic>;
-          if (formData.isNotEmpty && formData.containsKey('pp_ResponseCode')) {
-            _processPaymentResponse(formData.cast<String, String>());
-          }
-
-        } catch (e) {
-          // Silent error handling
+        // If we found response data, process it
+        final formData = allData['formData'] as Map<String, dynamic>;
+        if (formData.isNotEmpty && formData.containsKey('pp_ResponseCode')) {
+          _processPaymentResponse(formData.cast<String, String>());
         }
+
+      } catch (e) {
+        // Silent error handling
       }
-    }).catchError((error) {
+        }).catchError((error) {
       // Silent error handling
     });
   }
@@ -713,38 +711,31 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
     ''';
 
     _webViewController.runJavaScriptReturningResult(script).then((result) {
-      if (result != null) {
-        try {
-          final resultStr = result.toString();
-          final cleanResult = resultStr.startsWith('"') && resultStr.endsWith('"')
-              ? resultStr.substring(1, resultStr.length - 1)
-              : resultStr;
-          final decodedResult = cleanResult.replaceAll('\\"', '"');
+      try {
+        final resultStr = result.toString();
+        final cleanResult = resultStr.startsWith('"') && resultStr.endsWith('"')
+            ? resultStr.substring(1, resultStr.length - 1)
+            : resultStr;
+        final decodedResult = cleanResult.replaceAll('\\"', '"');
 
-          final extractedData = jsonDecode(decodedResult) as Map<String, dynamic>;
-          final responseData = extractedData['responseData'] as Map<String, dynamic>;
+        final extractedData = jsonDecode(decodedResult) as Map<String, dynamic>;
+        final responseData = extractedData['responseData'] as Map<String, dynamic>;
 
-          if (responseData.isNotEmpty && responseData.containsKey('pp_ResponseCode')) {
-            _processPaymentResponse(responseData.cast<String, String>());
-          } else {
-            if (!_hasProcessedResponse) {
-              _hasProcessedResponse = true;
-              widget.onPaymentFailure('Payment response not found. Please contact support.');
-            }
-          }
-        } catch (e) {
+        if (responseData.isNotEmpty && responseData.containsKey('pp_ResponseCode')) {
+          _processPaymentResponse(responseData.cast<String, String>());
+        } else {
           if (!_hasProcessedResponse) {
             _hasProcessedResponse = true;
-            widget.onPaymentFailure('Failed to parse payment response');
+            widget.onPaymentFailure('Payment response not found. Please contact support.');
           }
         }
-      } else {
+      } catch (e) {
         if (!_hasProcessedResponse) {
           _hasProcessedResponse = true;
-          widget.onPaymentFailure('Failed to extract payment response');
+          widget.onPaymentFailure('Failed to parse payment response');
         }
       }
-    }).catchError((error) {
+        }).catchError((error) {
       if (!_hasProcessedResponse) {
         _hasProcessedResponse = true;
         widget.onPaymentFailure('Failed to extract payment response');
