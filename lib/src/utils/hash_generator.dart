@@ -157,10 +157,6 @@ class JazzCashHashGenerator {
     return digest.toString().toUpperCase();
   }
 
-  /// Generate HMAC-SHA256 hash (deprecated - use public method)
-  static String _generateHMACSHA256(String hashString, String integritySalt) {
-    return generateHMACSHA256(hashString, integritySalt);
-  }
 }
 
 /// Utility class for date time formatting

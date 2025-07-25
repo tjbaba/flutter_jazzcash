@@ -5,7 +5,7 @@ import '../models/jazzcash_config.dart';
 import '../models/payment_models.dart';
 import '../utils/hash_generator.dart';
 
-/// WebView widget for JazzCash card payments
+/// WebView widgets for JazzCash card payments
 class JazzCashCardPaymentWebView extends StatefulWidget {
   final JazzCashConfig config;
   final JazzCashCardPaymentRequest paymentRequest;
@@ -81,7 +81,7 @@ class _JazzCashCardPaymentWebViewState extends State<JazzCashCardPaymentWebView>
             _handlePageFinished(url);
           },
           onWebResourceError: (WebResourceError error) {
-            // Ignore Norton security widget and similar third-party resource errors
+            // Ignore Norton security widgets and similar third-party resource errors
             if (error.url?.contains('norton.com') == true ||
                 error.url?.contains('symantec.com') == true ||
                 error.url?.contains('verisign.com') == true ||

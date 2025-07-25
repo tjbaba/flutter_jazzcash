@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jazzcash/src/widget/card_payment_webview.dart';
+import 'package:flutter_jazzcash/src/widgets/card_payment_webview.dart';
 import 'models/jazzcash_config.dart';
 import 'models/payment_models.dart';
 import 'services/mobile_wallet_service.dart';
