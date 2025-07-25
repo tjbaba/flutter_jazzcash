@@ -1,6 +1,6 @@
 name: flutter_jazzcash
 description: A Flutter package for JazzCash payment integration supporting both mobile wallet and card payments.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/tjbaba/flutter_jazzcash
 repository: https://github.com/tjbaba/flutter_jazzcash
 issue_tracker: https://github.com/tjbaba/flutter_jazzcash/issues

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.3] - 2025-07-26
+### Changed
+- Increased JazzCash mobile wallet payment timeout from 30 seconds to 120 seconds
+
 ## [1.0.2] - 2025-07-26
 ### Fixed
 - Fixed card payment integration issues
@@ -7,10 +11,10 @@
 - Improved payment flow stability and reliability
 
 ## [1.0.1] - 2025-07-25
+### Added
 - Added screenshots to package documentation
 
 ## [1.0.0] - 2025-07-25
-
 ### Added
 - Initial release of JazzCash Flutter package
 - Mobile wallet payment support
