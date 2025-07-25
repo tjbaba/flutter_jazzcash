@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jazzcash/flutter_jazzcash.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -53,7 +52,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     // Pre-fill with test data for easy testing
     mobileController.text = '03001234567';
-    cnicController.text = '1234567890123';
+    cnicController.text = '123456';
     amountController.text = '100';
     descriptionController.text = 'Test Payment';
   }
@@ -146,11 +145,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       controller: cnicController,
                       decoration: const InputDecoration(
                         labelText: 'CNIC',
-                        hintText: '1234567890123',
+                        hintText: 'last 6',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      maxLength: 13,
+                      maxLength: 6,
                     ),
                   ],
                 ),
@@ -277,7 +276,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'Mobile Wallet Payment Successful',
           'Transaction Reference: ${response.txnRefNo}\n'
               'Auth Code: ${response.authCode ?? 'N/A'}\n'
-              'Amount: PKR ${response.amount}',
+              'Amount: PKR ${double.parse(response.amount) / 100}',
           response.txnRefNo,
         );
       } else {
@@ -302,7 +301,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       amount: double.parse(amountController.text),
       billReference: 'CARD${DateTime.now().millisecondsSinceEpoch}',
       description: descriptionController.text.trim(),
-      returnUrl: 'https://yourapp.com/payment-return',
+      returnUrl: 'https://padellite.com/payment-return',
     );
 
     await jazzCash.openCardPayment(
@@ -313,7 +312,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'Card Payment Successful',
           'Transaction Reference: ${response.txnRefNo}\n'
               'Auth Code: ${response.authCode ?? 'N/A'}\n'
-              'Amount: PKR ${response.amount}',
+              'Amount: PKR ${double.parse(response.amount) / 100}',
           response.txnRefNo,
         );
       },
@@ -359,8 +358,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return false;
     }
 
-    if (cnicController.text.length != 13) {
-      _showErrorDialog('Validation Error', 'CNIC must be 13 digits');
+    if (cnicController.text.length != 6) {
+      _showErrorDialog('Validation Error', 'Enter last 6 digit from cnic');
       return false;
     }
 

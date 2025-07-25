@@ -5,42 +5,46 @@ import 'package:crypto/crypto.dart';
 class JazzCashHashGenerator {
   /// Generate secure hash for mobile wallet payment
   static String generateMobileWalletHash(
-    Map<String, dynamic> data,
-    String integritySalt,
-  ) {
-    // Get all PP fields and sort them alphabetically
-    final ppFields = <String, String>{};
+      Map<String, dynamic> data,
+      String integritySalt,
+      ) {
+    // Create hash string with specific field order for mobile wallet
+    final hashFields = [
+      data['pp_Amount'].toString(),
+      data['pp_BillReference'].toString(),
+      data['pp_CNIC'].toString(),
+      data['pp_Description'].toString(),
+      data['pp_Language'].toString(),
+      data['pp_MerchantID'].toString(),
+      data['pp_MobileNumber'].toString(),
+      data['pp_Password'].toString(),
+      data['pp_TxnCurrency'].toString(),
+      data['pp_TxnDateTime'].toString(),
+      data['pp_TxnExpiryDateTime'].toString(),
+      data['pp_TxnRefNo'].toString(),
+      data['ppmpf_1'].toString(),
+      data['ppmpf_2'].toString(),
+      data['ppmpf_3'].toString(),
+      data['ppmpf_4'].toString(),
+      data['ppmpf_5'].toString(),
+    ];
 
-    data.forEach((key, value) {
-      if (key.toLowerCase().startsWith('pp_') ||
-          key.toLowerCase().startsWith('ppmpf_')) {
-        ppFields[key.toLowerCase()] = value.toString();
-      }
-    });
-
-    // Sort keys alphabetically
-    final sortedKeys = ppFields.keys.toList()..sort();
-
-    // Create concatenated string with non-empty values only
-    final values = <String>[];
-    for (final key in sortedKeys) {
-      final value = ppFields[key] ?? '';
-      if (value.isNotEmpty) {
-        values.add(value);
+    // Create hash string by prepending integrity salt
+    String hashString = integritySalt;
+    for (final field in hashFields) {
+      if (field.isNotEmpty && field != 'null') {
+        hashString += '&$field';
       }
     }
-
-    // Prepend integrity salt and join with &
-    final hashString = '$integritySalt&${values.join('&')}';
 
     return generateHMACSHA256(hashString, integritySalt);
   }
 
   /// Generate secure hash for card payment
   static String generateCardPaymentHash(
-    Map<String, dynamic> data,
-    String integritySalt,
-  ) {
+      Map<String, dynamic> data,
+      String integritySalt,
+      ) {
     // For card payments, use specific field order as per documentation
     final hashFields = [
       data['pp_Amount'].toString(),
@@ -68,7 +72,7 @@ class JazzCashHashGenerator {
     // Create hash string by prepending integrity salt
     String hashString = integritySalt;
     for (final field in hashFields) {
-      if (field.isNotEmpty) {
+      if (field.isNotEmpty && field != 'null') {
         hashString += '&$field';
       }
     }
@@ -78,9 +82,9 @@ class JazzCashHashGenerator {
 
   /// Generate secure hash for response validation
   static String generateResponseHash(
-    Map<String, dynamic> data,
-    String integritySalt,
-  ) {
+      Map<String, dynamic> data,
+      String integritySalt,
+      ) {
     // For response validation, use all PP fields in alphabetical order
     final ppFields = <String, String>{};
 
@@ -93,8 +97,16 @@ class JazzCashHashGenerator {
     // Sort keys alphabetically
     final sortedKeys = ppFields.keys.toList()..sort();
 
-    // Create concatenated string
-    final values = sortedKeys.map((key) => ppFields[key] ?? '').toList();
+    // Create concatenated string with non-empty values only
+    final values = <String>[];
+    for (final key in sortedKeys) {
+      final value = ppFields[key] ?? '';
+      if (value.isNotEmpty && value != 'null') {
+        values.add(value);
+      }
+    }
+
+    // Prepend integrity salt and join with &
     final hashString = '$integritySalt&${values.join('&')}';
 
     return generateHMACSHA256(hashString, integritySalt);
@@ -102,36 +114,52 @@ class JazzCashHashGenerator {
 
   /// Validate response hash
   static bool validateResponseHash(
-    Map<String, dynamic> responseData,
-    String integritySalt,
-  ) {
+      Map<String, dynamic> responseData,
+      String integritySalt,
+      ) {
     try {
       // Extract secure hash from response
-      final receivedHash =
-          responseData['pp_SecureHash']?.toString().toUpperCase() ?? '';
+      final receivedHash = responseData['pp_SecureHash']?.toString().toUpperCase() ?? '';
+
+      if (receivedHash.isEmpty) {
+        print('❌ No secure hash found in response');
+        return false;
+      }
 
       // Remove secure hash from data for validation
       final dataForValidation = Map<String, dynamic>.from(responseData);
       dataForValidation.remove('pp_SecureHash');
 
       // Generate expected hash
-      final expectedHash =
-          generateResponseHash(dataForValidation, integritySalt);
+      final expectedHash = generateResponseHash(dataForValidation, integritySalt);
+
+      print('🔒 Hash Validation:');
+      print('Received Hash: $receivedHash');
+      print('Expected Hash: $expectedHash');
+      print('Fields used: ${dataForValidation.keys.toList()}');
 
       return receivedHash == expectedHash;
     } catch (e) {
+      print('❌ Hash validation error: $e');
       return false;
     }
   }
 
-  /// Generate HMAC-SHA256 hash
+  /// Generate HMAC-SHA256 hash (made public)
   static String generateHMACSHA256(String hashString, String integritySalt) {
+    print('🔑 Hash String: $hashString'); // Debug print
+
     final key = utf8.encode(integritySalt);
     final bytes = utf8.encode(hashString);
     final hmacSha256 = Hmac(sha256, key);
     final digest = hmacSha256.convert(bytes);
 
     return digest.toString().toUpperCase();
+  }
+
+  /// Generate HMAC-SHA256 hash (deprecated - use public method)
+  static String _generateHMACSHA256(String hashString, String integritySalt) {
+    return generateHMACSHA256(hashString, integritySalt);
   }
 }
 
@@ -151,8 +179,7 @@ class DateTimeHelper {
   static String generateTxnRefNo([String? prefix]) {
     final now = DateTime.now();
     final timestamp = formatDateTime(now);
-    final random =
-        (now.millisecondsSinceEpoch % 1000).toString().padLeft(3, '0');
+    final random = (now.millisecondsSinceEpoch % 1000).toString().padLeft(3, '0');
     return '${prefix ?? 'T'}$timestamp$random';
   }
 

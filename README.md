@@ -7,7 +7,7 @@
 
 |          Mobile Wallet Payment           |              Card Payment              |           Card Payment           |
 |:----------------------------------------:|:--------------------------------------:|:--------------------------------:|
-| ![Mobile Wallet](screenshots/mobile.jpg) | ![Card Payment](screenshots/card1.jpg) | ![Status](screenshots/card2.jpg) |
+| ![Mobile Wallet](https://raw.githubusercontent.com/tjbaba/flutter_jazzcash/main/screenshots/mobile.jpg) | ![Card Payment](https://raw.githubusercontent.com/tjbaba/flutter_jazzcash/refs/heads/main/screenshots/card1.jpg) | ![Status](https://raw.githubusercontent.com/tjbaba/flutter_jazzcash/refs/heads/main/screenshots/card2.jpg) |
 
 
 A comprehensive guide for integrating JazzCash payments in your Flutter app using both mobile wallet and card payment methods.

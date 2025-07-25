@@ -12,8 +12,8 @@ class JazzCashMobileWalletService {
 
   /// Process mobile wallet payment
   Future<JazzCashMobileWalletResponse> processPayment(
-    JazzCashMobileWalletRequest request,
-  ) async {
+      JazzCashMobileWalletRequest request,
+      ) async {
     try {
       final requestData = _buildRequestData(request);
       final response = await _makeApiCall(requestData);
@@ -53,9 +53,9 @@ class JazzCashMobileWalletService {
       'ppmpf_5': request.customFields?['ppmpf_5'] ?? '',
     };
 
-    // Generate secure hash
+    // Generate secure hash - FIXED: Pass data map, not hashString
     data['pp_SecureHash'] = JazzCashHashGenerator.generateMobileWalletHash(
-      data,
+      data,  // ✅ Pass the data map
       config.integritySalt,
     );
 
@@ -72,13 +72,17 @@ class JazzCashMobileWalletService {
 
     final body = jsonEncode(data);
 
-    final response = await http
-        .post(
-          Uri.parse(url),
-          headers: headers,
-          body: body,
-        )
-        .timeout(const Duration(seconds: 30));
+    print('🔍 DEBUG: Request URL: $url');
+    print('🔍 DEBUG: Request Data: $data');
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    ).timeout(const Duration(seconds: 30));
+
+    print('🔍 DEBUG: Response Status: ${response.statusCode}');
+    print('🔍 DEBUG: Response Body: ${response.body}');
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body) as Map<String, dynamic>;
@@ -113,13 +117,17 @@ class JazzCashMobileWalletService {
 
       final body = jsonEncode(requestData);
 
-      final response = await http
-          .post(
-            Uri.parse(url),
-            headers: headers,
-            body: body,
-          )
-          .timeout(const Duration(seconds: 30));
+      print('🔍 DEBUG: Status Inquiry URL: $url');
+      print('🔍 DEBUG: Status Inquiry Data: $requestData');
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: body,
+      ).timeout(const Duration(seconds: 30));
+
+      print('🔍 DEBUG: Status Response: ${response.statusCode}');
+      print('🔍 DEBUG: Status Body: ${response.body}');
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
@@ -142,7 +150,7 @@ class JazzCashMobileWalletService {
       'pp_Password': config.password,
     };
 
-    // Generate hash for status inquiry
+    // Generate hash for status inquiry - using public method
     final fields = [
       data['pp_MerchantID'].toString(),
       data['pp_Password'].toString(),
